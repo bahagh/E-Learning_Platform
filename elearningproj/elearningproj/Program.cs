@@ -8,8 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString,
         sqlServerOptionsAction: sqlOptions =>
         {
@@ -17,8 +15,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         }));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -29,6 +29,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Description"
     });
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -59,5 +60,32 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+using(var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roles = new[] { "Admin" , "Teacher" , "Student" };
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    string email = "admin@admin.com";
+    string password = "Ilovemymum@123";
+    if(await userManager.FindByEmailAsync(email) == null)
+    {
+        var user = new IdentityUser();
+        user.UserName = email;
+        user.Email = email;
+        await userManager.CreateAsync(user, password);
+        userManager.AddToRoleAsync(user, "Admin");
+
+    }
+
+}
 
 app.Run();

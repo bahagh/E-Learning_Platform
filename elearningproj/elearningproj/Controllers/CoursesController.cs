@@ -138,5 +138,23 @@ namespace elearningproj.Controllers
 
             return NoContent();
         }
+        [HttpGet("GetUserName", Name = "GetUserName")]
+        public IActionResult GetUserName()
+        {
+            // Check if the user is authenticated
+            if (User.Identity.IsAuthenticated)
+            {
+                // Retrieve the username
+                var username = User.Identity.Name;
+                return Ok(new { UserName = username });
+            }
+            else
+            {
+                // If the user is not authenticated, return an error or appropriate response
+                return BadRequest("User is not authenticated");
+            }
+        }
+
+
     }
 }

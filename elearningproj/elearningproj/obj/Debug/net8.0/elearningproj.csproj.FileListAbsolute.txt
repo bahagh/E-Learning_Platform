@@ -142,3 +142,4 @@ C:\Users\Asus\Desktop\Fullstack\elearningproj\elearningproj\obj\Debug\net8.0\ref
 C:\Users\Asus\Desktop\Fullstack\elearningproj\elearningproj\obj\Debug\net8.0\elearningproj.pdb
 C:\Users\Asus\Desktop\Fullstack\elearningproj\elearningproj\obj\Debug\net8.0\elearningproj.genruntimeconfig.cache
 C:\Users\Asus\Desktop\Fullstack\elearningproj\elearningproj\obj\Debug\net8.0\ref\elearningproj.dll
+C:\Users\Asus\Desktop\Fullstack\elearningproj\elearningproj\obj\Debug\net8.0\elearningproj.sourcelink.json

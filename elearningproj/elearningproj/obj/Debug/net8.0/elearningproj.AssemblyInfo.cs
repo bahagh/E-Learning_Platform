@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("elearningproj")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d98283fb4415d53671d7b627de2ecdbaebf73ac")]
 [assembly: System.Reflection.AssemblyProductAttribute("elearningproj")]
 [assembly: System.Reflection.AssemblyTitleAttribute("elearningproj")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
