@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using elearningproj.Data;
 using elearningproj.Models;
+using System.Security.Claims;
 
 namespace elearningproj.Controllers
 {
@@ -147,6 +148,39 @@ namespace elearningproj.Controllers
                 // Retrieve the username
                 var username = User.Identity.Name;
                 return Ok(new { UserName = username });
+            }
+            else
+            {
+                // If the user is not authenticated, return an error or appropriate response
+                return BadRequest("User is not authenticated");
+            }
+        }
+        [HttpPost("{courseId}/enroll", Name = "EnrollInCourse")]
+        public IActionResult EnrollInCourse(int courseId)
+        {
+            // Check if the user is authenticated
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Check if the user is already enrolled in the course
+                if (!_context.Enrollments.Any(e => e.UserId == userId && e.CourseId == courseId))
+                {
+                    var enrollment = new Enrollment
+                    {
+                        UserId = userId,
+                        CourseId = courseId
+                    };
+
+                    _context.Enrollments.Add(enrollment);
+                    _context.SaveChanges();
+
+                    return Ok(new { Message = "Enrollment successful" });
+                }
+                else
+                {
+                    return BadRequest("User is already enrolled in the course");
+                }
             }
             else
             {

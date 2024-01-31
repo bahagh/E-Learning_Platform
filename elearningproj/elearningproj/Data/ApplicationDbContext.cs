@@ -14,6 +14,7 @@ namespace elearningproj.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<IdentityRole> IdentityRoles { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
 
     }
 }
