@@ -4,6 +4,7 @@ using System.Linq;
 using elearningproj.Data;
 using elearningproj.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace elearningproj.Controllers
 {
@@ -187,6 +188,81 @@ namespace elearningproj.Controllers
                 // If the user is not authenticated, return an error or appropriate response
                 return BadRequest("User is not authenticated");
             }
+        }
+        [HttpGet("GetEnrolledCourses", Name = "GetEnrolledCourses")]
+        public IActionResult GetEnrolledCourses()
+        {
+            // Check if the user is authenticated
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Retrieve the courses that the user is enrolled in
+                var enrolledCourses = _context.Enrollments
+                    .Where(e => e.UserId == userId)
+                    .Select(e => e.Course)
+                    .ToList();
+
+                return Ok(enrolledCourses);
+            }
+            else
+            {
+                // If the user is not authenticated, return an error or appropriate response
+                return BadRequest("User is not authenticated");
+            }
+        }
+
+        [HttpGet("{courseId}/comments", Name = "GetCourseComments")]
+        public IActionResult GetCourseComments(int courseId)
+        {
+            var comments = _context.CourseComments
+                .Where(c => c.CourseId == courseId)
+                .ToList();
+
+            return Ok(comments);
+        }
+
+        [HttpPost("{courseId}/add-comment", Name = "AddCourseComment")]
+        public IActionResult AddCourseComment(int courseId, string commentaire)
+        {
+            // Retrieve the id of the logged-in user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Instantiate a new CourseComment
+            CourseComment comment = new CourseComment
+            {
+                UserId = userId,
+                CreatedAt = DateTime.Now,
+                CourseId = courseId,
+                Comment = commentaire
+            };
+
+            _context.CourseComments.Add(comment);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetCourseComments), new { courseId = courseId }, comment);
+        }
+
+
+        [HttpDelete("{courseId}/delete-comment/{commentId}", Name = "DeleteCourseComment")]
+        [Authorize] // Ensure only authenticated users can delete comments
+        public IActionResult DeleteCourseComment(int courseId, int commentId)
+        {
+            // Retrieve the id of the logged-in user
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var comment = _context.CourseComments
+                .FirstOrDefault(c => c.Id == commentId && c.CourseId == courseId && c.UserId == userId);
+
+            if (comment == null)
+            {
+                return NotFound("Comment not found or unauthorized");
+            }
+
+            _context.CourseComments.Remove(comment);
+            _context.SaveChanges();
+
+            return NoContent();
         }
 
 
